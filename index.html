@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shop Billing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Racing+Sans+One&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style id="pageSize">@page{size:A4;margin:8mm}</style>
+</head>
+<body>
+
+<header class="app">
+  <nav class="tabs">
+    <span class="ind" id="ind"></span>
+    <button data-tab="bill" class="on">New Bill</button>
+    <button data-tab="view">Saved Bills <em id="cnt">0</em></button>
+  </nav>
+  <span class="grow"></span>
+  <select class="bar-select" id="size" title="Print size">
+    <option value="A4">A4</option><option value="A5">A5</option><option value="80mm">Thermal 80mm</option>
+  </select>
+  <button class="btn soft" id="setBtn" title="Shop details &amp; logo">⚙ Shop</button>
+  <button class="btn soft" id="newBtn">New</button>
+  <button class="btn" id="saveBtn">Save</button>
+  <button class="btn amber" id="printBtn">Print / PDF</button>
+</header>
+
+<main>
+<!-- =================== BILL =================== -->
+<section id="tab-bill">
+<div class="paper" id="paper">
+  <div class="wm"><span id="wmText"></span></div>
+  <div class="band"><i></i><i></i><i></i><i></i></div>
+  <div class="head2">
+    <div class="memo"><span class="ln"></span><span class="memo-t">CASH MEMO</span><span class="ln"></span></div>
+    <div class="brand2">
+      <div class="logo" id="logo"></div>
+      <h2 id="shopName"></h2>
+      <div class="tag" id="shopTag"></div>
+    </div>
+    <div class="contact" id="contact"></div>
+    <div class="metastrip">
+      <div class="mc"><small>BILL NO.</small><b id="billNo"></b></div>
+      <div class="mc"><small>DATE</small><b id="billDate"></b></div>
+      <div class="mc"><small>TIME</small><b id="billTime"></b></div>
+      <div class="mc"><small>STATUS</small><span id="status">Draft</span></div>
+    </div>
+  </div>
+
+  <div class="cust">
+    <label>Customer name<input id="cName" placeholder="Walk-in Customer"></label>
+    <label>Phone<input id="cPhone" inputmode="tel"></label>
+    <label>Address<input id="cAddr"></label>
+    <label class="plate-field">Car number
+      <span class="plate"><span class="plate-ind">IND</span><input id="cCar" placeholder="WB 12 AB 1234" maxlength="13"></span>
+    </label>
+  </div>
+
+  <div class="items">
+    <div class="tw">
+    <table class="it">
+      <thead><tr>
+        <th>SL</th><th style="text-align:left">Item / Description</th><th style="width:80px">Qty</th><th style="width:100px">Rate (₹)</th><th style="text-align:right;padding-right:10px">Amount (₹)</th><th class="np"></th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    </div>
+    <div class="addrow"><button id="addRow">+ Add row</button></div>
+    <div class="itemsum" id="itemSum"></div>
+  </div>
+
+  <div class="bottom">
+    <div>
+      <div class="card pay">
+        <div class="row"><b>Payment mode</b>
+          <select id="mode"><option>Cash</option><option>UPI</option><option>Card</option><option>Online</option></select></div>
+        <div class="row"><span>Amount paid</span><input class="n" id="paid" inputmode="decimal" placeholder="Full amount"></div>
+        <div class="row"><span id="balLabel">Balance</span><b id="balance">—</b></div>
+        <div class="hist" id="payHist"></div>
+      </div>
+      <div class="card paybox" id="dueBox" hidden>
+        <div class="dueline"><span>Due amount</span><b id="dueAmt">₹0.00</b></div>
+        <div class="row"><span>Receive now</span><input class="n" id="rcv" inputmode="decimal" placeholder="Full due"></div>
+        <div class="row"><span>Payment mode</span><select id="rcvMode"><option>Cash</option><option>UPI</option><option>Card</option><option>Online</option></select></div>
+        <button class="btn green" id="payBtn" type="button" style="width:100%;margin-top:8px">Pay</button>
+      </div>
+    </div>
+    <div>
+      <div class="card sum">
+        <div class="row"><span>Subtotal</span><b id="subtotal">₹0.00</b></div>
+        <div class="row"><span>Discount</span>
+          <span class="ctl"><span class="hint" id="discHint"></span><input class="n" id="discount" inputmode="decimal" placeholder="0"><select id="discUnit"><option>₹</option><option>%</option></select></span></div>
+        <div class="row"><span>Offer</span>
+          <span class="ctl"><input class="n" id="offer" inputmode="decimal" placeholder="0"></span></div>
+        <div class="row"><span>Tax</span>
+          <span class="ctl"><span class="hint" id="taxHint"></span><input class="n" id="tax" inputmode="decimal" placeholder="0"><select id="taxUnit"><option>₹</option><option>%</option></select></span></div>
+        <div class="grand"><span>TOTAL AMOUNT</span><b id="total">₹0.00</b></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes"><b style="color:var(--ink)">Notes &amp; terms</b><ul id="notesList"></ul></div>
+  <div class="sign"><span>Authorized signature</span></div>
+  <div class="band"><i></i><i></i><i></i><i></i></div>
+  <div class="foot"><i>✦</i> <span id="thanks"></span> <i>✦</i></div>
+  <div class="stamp" id="stamp">SAVED</div>
+</div>
+</section>
+
+<!-- =================== SAVED BILLS =================== -->
+<section id="tab-view" hidden>
+<div class="panel">
+  <div class="stats">
+    <div class="stat"><span>Today</span><b id="stToday">₹0</b><small id="stTodayN"></small></div>
+    <div class="stat"><span>This month</span><b id="stMonth">₹0</b><small id="stMonthN"></small></div>
+    <div class="stat"><span>All bills</span><b id="stAll">₹0</b><small id="stAllN"></small></div>
+    <div class="stat"><span>Total due</span><b id="stDue">₹0</b><small id="stDueN"></small></div>
+  </div>
+  <div class="filters">
+    <button data-f="all" class="on">All <span id="fAll"></span></button>
+    <button data-f="due">Due <span id="fDue"></span></button>
+    <button data-f="paid">Paid <span id="fPaid"></span></button>
+  </div>
+  <div class="tools">
+    <input type="search" id="q" placeholder="Search bill no, customer, phone or item…">
+    <button class="btn soft" id="csvBtn">Export Excel</button>
+    <button class="btn soft" id="bkBtn">Backup</button>
+    <button class="btn soft" id="rsBtn">Restore</button>
+    <input type="file" id="rsFile" accept=".json,application/json" hidden>
+  </div>
+  <div class="tw">
+  <table class="bl">
+    <thead><tr><th>Bill no.</th><th>Date &amp; time</th><th>Customer</th><th>Status</th><th class="r" style="text-align:right">Total</th><th></th></tr></thead>
+    <tbody id="billList"></tbody>
+  </table>
+  </div>
+  <p class="empty-msg" id="emptyMsg"></p>
+  <div class="info">
+    <b>Where are my bills saved?</b><br>
+    They are kept inside this browser on this device, and they appear on this page every time you open the billing file in the same browser.
+    Clearing browser data will delete them, so press <b>Backup</b> regularly and keep the file safe (Google Drive or WhatsApp to yourself).
+    Use <b>Restore</b> to bring bills back on a new phone or computer.
+  </div>
+</div>
+</section>
+</main>
+
+<datalist id="prods"></datalist>
+
+<!-- =================== SETTINGS =================== -->
+<dialog id="dlg">
+  <div class="dh">Shop details</div>
+  <div class="db">
+    <label class="full">Shop name<input id="sName"></label>
+    <label>Bill code (short)<input id="sCode" maxlength="6"></label>
+    <label>GSTIN<input id="sGst"></label>
+    <label class="full">Tagline<input id="sTag"></label>
+    <label class="full">Address<input id="sAddr"></label>
+    <label>Phone / WhatsApp<input id="sPhone"></label>
+    <label>Email<input id="sEmail"></label>
+    <label class="full">Notes &amp; terms (one line per point)<textarea id="sNotes" rows="4"></textarea></label>
+    <label class="full">Footer message<input id="sThanks"></label>
+    <div class="full logo-row">
+      <div class="logo" id="sLogoPrev" style="width:54px;height:54px;font-size:22px"></div>
+      <label class="btn soft small" style="cursor:pointer">Upload logo<input type="file" id="sLogoFile" accept="image/*" hidden></label>
+      <button class="btn soft small" id="sLogoDel" type="button">Remove logo</button>
+    </div>
+  </div>
+  <div class="df"><button class="btn soft" id="sCancel">Cancel</button><button class="btn" id="sSave">Save details</button></div>
+</dialog>
+
+<div id="toast"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
